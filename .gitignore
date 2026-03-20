@@ -1,0 +1,5 @@
+*.o
+*.a
+demo_turtle
+demo_entities
+demo_painter
