@@ -85,8 +85,11 @@ static void draw_shape(SDL_Surface *screen, PlacedShape *s)
                              s->color.r, s->color.g, s->color.b, 1);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    (void)argc; /* non utilisé */
+    (void)argv; /* non utilisé */
+    
     ESGX_Event   ev          = {0};
     PlacedShape  shapes[MAX_SHAPES];
     int          shape_count = 0;

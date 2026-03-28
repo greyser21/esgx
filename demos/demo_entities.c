@@ -45,8 +45,11 @@ static void wander_update(ESGX_Entity *self, void *userdata)
     esgx_entity_bounce(self, WIN_W, WIN_H);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    (void)argc; /* non utilisé */
+    (void)argv; /* non utilisé */
+    
     ESGX_Event    ev       = {0};
     ESGX_Entity  *entities[NB_ENTITIES];
     ESGX_Draw    *draws[NB_ENTITIES];

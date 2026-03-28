@@ -52,8 +52,11 @@ static void draw_turtle_func(SDL_Surface *screen, int x, int y, void *userdata)
     esgx_draw_line_raw(screen, x + 34, y + 14, x + 14, y + 34, 0, 100, 0);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    (void)argc; /* non utilisé */
+    (void)argv; /* non utilisé */
+
     ESGX_Event ev = {0};
     double turtle_angle = 0.0;
 

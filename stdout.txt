@@ -1,0 +1,4 @@
+[ESGX] Fenêtre 800x600 créée : "ESGX Demo - Tortue"
+=== Demo Tortue ===
+La tortue suit votre curseur. Appuyez sur Échap pour quitter.
+[ESGX] Fenêtre fermée.
