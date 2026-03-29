@@ -14,6 +14,8 @@ int esgx_window_init(int width, int height, const char *title)
         return -1;
     }
 
+    SDL_EnableUNICODE(1);
+
     esgx_screen = SDL_SetVideoMode(width, height, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
     if (!esgx_screen) {
         fprintf(stderr, "[ESGX] SDL_SetVideoMode error: %s\n", SDL_GetError());

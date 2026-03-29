@@ -102,23 +102,24 @@ int main(int argc, char *argv[])
 
     while (esgx_event_poll(&ev)) {
 
-        /* Clavier */
         if (ev.key_down) {
-            switch (ev.raw_key.sym) {
-                case SDLK_r:        mode = MODE_RECT;                          break;
-                case SDLK_c:        mode = MODE_CIRCLE;                        break;
-                case SDLK_1:        color_idx = 0;                             break;
-                case SDLK_2:        color_idx = 1;                             break;
-                case SDLK_3:        color_idx = 2;                             break;
-                case SDLK_4:        color_idx = 3;                             break;
-                case SDLK_5:        color_idx = 4;                             break;
-                case SDLK_PLUS:
-                case SDLK_KP_PLUS:  if (size < 200) size += 10;               break;
-                case SDLK_MINUS:
-                case SDLK_KP_MINUS: if (size > 10)  size -= 10;               break;
-                case SDLK_DELETE:
-                case SDLK_BACKSPACE: if (shape_count > 0) shape_count--;      break;
-                default: break;
+            if (ev.raw_key.unicode == '+') {
+                if (size < 200) size += 10;
+            } else if (ev.raw_key.unicode == '-') {
+                if (size > 10) size -= 10;
+            } else {
+                switch (ev.raw_key.sym) {
+                    case SDLK_r:        mode = MODE_RECT;                          break;
+                    case SDLK_c:        mode = MODE_CIRCLE;                        break;
+                    case SDLK_1:        color_idx = 0;                             break;
+                    case SDLK_2:        color_idx = 1;                             break;
+                    case SDLK_3:        color_idx = 2;                             break;
+                    case SDLK_4:        color_idx = 3;                             break;
+                    case SDLK_5:        color_idx = 4;                             break;
+                    case SDLK_DELETE:
+                    case SDLK_BACKSPACE: if (shape_count > 0) shape_count--;      break;
+                    default: break;
+                }
             }
         }
 
