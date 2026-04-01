@@ -7,4 +7,4 @@
 #include "esgx_draw.h"
 #include "esgx_entity.h"
 
-#endif /* ESGX_H */
+#endif

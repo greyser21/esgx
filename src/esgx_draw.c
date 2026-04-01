@@ -5,10 +5,6 @@
 #include <math.h>
 #include <string.h>
 
-/* ============================================================
- *  Utilitaires bas niveau
- * ============================================================ */
-
 void esgx_put_pixel(SDL_Surface *s, int x, int y, Uint8 r, Uint8 g, Uint8 b)
 {
     if (x < 0 || y < 0 || x >= s->w || y >= s->h) return;
@@ -41,7 +37,6 @@ void esgx_draw_rect_raw(SDL_Surface *s, int x, int y, int w, int h,
         SDL_Rect rect = { (Sint16)x, (Sint16)y, (Uint16)w, (Uint16)h };
         SDL_FillRect(s, &rect, SDL_MapRGB(s->format, r, g, b));
     } else {
-        /* Bords */
         int i;
         for (i = x; i < x + w; i++) {
             esgx_put_pixel(s, i, y,         r, g, b);
@@ -57,7 +52,6 @@ void esgx_draw_rect_raw(SDL_Surface *s, int x, int y, int w, int h,
 void esgx_draw_circle_raw(SDL_Surface *s, int cx, int cy, int radius,
                            Uint8 r, Uint8 g, Uint8 b, int filled)
 {
-    /* Algorithme de Bresenham */
     int x = 0, y = radius;
     int d = 3 - 2 * radius;
 
@@ -91,7 +85,6 @@ void esgx_draw_circle_raw(SDL_Surface *s, int cx, int cy, int radius,
 void esgx_draw_line_raw(SDL_Surface *s, int x1, int y1, int x2, int y2,
                          Uint8 r, Uint8 g, Uint8 b)
 {
-    /* Algorithme de Bresenham */
     int dx = abs(x2 - x1), sx = (x1 < x2) ? 1 : -1;
     int dy = abs(y2 - y1), sy = (y1 < y2) ? 1 : -1;
     int err = dx - dy, e2;
@@ -104,10 +97,6 @@ void esgx_draw_line_raw(SDL_Surface *s, int x1, int y1, int x2, int y2,
         if (e2 <  dx) { err += dx; y1 += sy; }
     }
 }
-
-/* ============================================================
- *  Transform par défaut
- * ============================================================ */
 
 static ESGX_Transform transform_default(void)
 {
@@ -122,10 +111,6 @@ static ESGX_Transform transform_default(void)
     return t;
 }
 
-/* ============================================================
- *  Constructeurs
- * ============================================================ */
-
 ESGX_Draw *esgx_draw_from_image(const char *path)
 {
     SDL_Surface *raw = SDL_LoadBMP(path);
@@ -134,10 +119,9 @@ ESGX_Draw *esgx_draw_from_image(const char *path)
                 path, SDL_GetError());
         return NULL;
     }
-    /* Optimisation : convertir au format de l'écran */
     SDL_Surface *opt = SDL_DisplayFormat(raw);
     SDL_FreeSurface(raw);
-    if (!opt) opt = raw; /* fallback si DisplayFormat échoue */
+    if (!opt) opt = raw;
 
     ESGX_Draw *d = (ESGX_Draw *)malloc(sizeof(ESGX_Draw));
     if (!d) { SDL_FreeSurface(opt); return NULL; }
@@ -181,7 +165,7 @@ ESGX_Draw *esgx_draw_circle(int radius, Uint8 r, Uint8 g, Uint8 b, int filled)
     if (!d) return NULL;
     d->type            = ESGX_DRAW_SHAPE;
     d->data.shape.type = ESGX_SHAPE_CIRCLE;
-    d->data.shape.w    = radius;  /* on stocke le rayon dans w */
+    d->data.shape.w    = radius;
     d->data.shape.h    = radius;
     d->data.shape.r    = r;
     d->data.shape.g    = g;
@@ -200,11 +184,6 @@ ESGX_Draw *esgx_draw_from_anim(struct ESGX_Animation *anim)
     d->transform  = transform_default();
     return d;
 }
-
-/* ============================================================
- *  Transformations
- * ============================================================ */
-
 void esgx_draw_set_scale(ESGX_Draw *d, double sx, double sy)
 {
     if (!d) return;
@@ -238,27 +217,15 @@ void esgx_draw_reset_transform(ESGX_Draw *d)
     d->transform = transform_default();
 }
 
-/* ============================================================
- *  Application des transformations sur une SDL_Surface
- *  (scale + flip + rotation par rotation pixel-by-pixel)
- * ============================================================ */
-
-/*
- * Applique scale, flip et rotation sur 'src' et retourne
- * une nouvelle SDL_Surface transformée.
- * L'appelant est responsable de libérer la surface retournée.
- */
 static SDL_Surface *apply_transform(SDL_Surface *src, ESGX_Transform *t)
 {
     if (!src) return NULL;
 
-    /* 1. Calcul des dimensions finales après scale */
     int new_w = (int)(src->w * fabs(t->scale_x));
     int new_h = (int)(src->h * fabs(t->scale_y));
     if (new_w < 1) new_w = 1;
     if (new_h < 1) new_h = 1;
 
-    /* 2. Rotation : agrandir la surface pour contenir l'image tournée */
     double rad   = t->angle * M_PI / 180.0;
     double cosA  = fabs(cos(rad));
     double sinA  = fabs(sin(rad));
@@ -273,10 +240,8 @@ static SDL_Surface *apply_transform(SDL_Surface *src, ESGX_Transform *t)
                                              src->format->Amask);
     if (!dst) return NULL;
 
-    /* Couleur de remplissage transparente / noire */
     SDL_FillRect(dst, NULL, SDL_MapRGB(dst->format, 0, 0, 0));
 
-    /* 3. Transformation pixel par pixel */
     double cx_dst = rot_w / 2.0;
     double cy_dst = rot_h / 2.0;
     double cx_src = new_w / 2.0;
@@ -285,28 +250,22 @@ static SDL_Surface *apply_transform(SDL_Surface *src, ESGX_Transform *t)
     int dx, dy;
     for (dy = 0; dy < rot_h; dy++) {
         for (dx = 0; dx < rot_w; dx++) {
-            /* Coordonnées relatives au centre destination */
             double rx = dx - cx_dst;
             double ry = dy - cy_dst;
 
-            /* Rotation inverse */
             double sx_r = rx * cos(-rad) - ry * sin(-rad) + cx_src;
             double sy_r = rx * sin(-rad) + ry * cos(-rad) + cy_src;
 
-            /* Retour aux coordonnées sources (avant scale) */
             int sx_orig = (int)(sx_r / fabs(t->scale_x));
             int sy_orig = (int)(sy_r / fabs(t->scale_y));
 
-            /* Flip */
             if (t->flip_h) sx_orig = src->w - 1 - sx_orig;
             if (t->flip_v) sy_orig = src->h - 1 - sy_orig;
 
-            /* Vérification des bornes */
             if (sx_orig < 0 || sx_orig >= src->w ||
                 sy_orig < 0 || sy_orig >= src->h)
                 continue;
 
-            /* Copie du pixel */
             Uint8 *sp = (Uint8 *)src->pixels
                         + sy_orig * src->pitch
                         + sx_orig * src->format->BytesPerPixel;
@@ -320,10 +279,6 @@ static SDL_Surface *apply_transform(SDL_Surface *src, ESGX_Transform *t)
 
     return dst;
 }
-
-/* ============================================================
- *  Rendu principal
- * ============================================================ */
 
 void esgx_draw_render(ESGX_Draw *d, SDL_Surface *screen, int x, int y)
 {
@@ -404,10 +359,6 @@ void esgx_draw_render(ESGX_Draw *d, SDL_Surface *screen, int x, int y)
         }
     }
 }
-
-/* ============================================================
- *  Libération
- * ============================================================ */
 
 void esgx_draw_free(ESGX_Draw *d)
 {

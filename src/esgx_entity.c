@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-/* Calcule w/h de l'entité selon le type de Dessin */
 static void entity_compute_size(ESGX_Entity *e)
 {
     if (!e->draw) { e->w = 0; e->h = 0; return; }
@@ -31,14 +30,10 @@ static void entity_compute_size(ESGX_Entity *e)
             }
             break;
         default:
-            e->w = 32; e->h = 32; /* fallback pour FUNC */
+            e->w = 32; e->h = 32;
             break;
     }
 }
-
-/* ============================================================
- *  Création / Destruction
- * ============================================================ */
 
 ESGX_Entity *esgx_entity_create(double x, double y, ESGX_Draw *draw)
 {
@@ -63,10 +58,6 @@ void esgx_entity_free(ESGX_Entity *entity)
 {
     free(entity);
 }
-
-/* ============================================================
- *  Mise à jour
- * ============================================================ */
 
 void esgx_entity_update(ESGX_Entity *entity)
 {
@@ -116,7 +107,7 @@ int esgx_entity_move_toward(ESGX_Entity *entity,
         entity->y  = y_target;
         entity->vx = 0.0;
         entity->vy = 0.0;
-        return 1; /* Cible atteinte */
+        return 1;
     }
 
     entity->vx = (dx / dist) * speed;
@@ -126,19 +117,11 @@ int esgx_entity_move_toward(ESGX_Entity *entity,
     return 0;
 }
 
-/* ============================================================
- *  Rendu
- * ============================================================ */
-
 void esgx_entity_draw(ESGX_Entity *entity, SDL_Surface *screen)
 {
     if (!entity || !entity->visible || !entity->draw) return;
     esgx_draw_render(entity->draw, screen, (int)entity->x, (int)entity->y);
 }
-
-/* ============================================================
- *  Accès / mutateurs
- * ============================================================ */
 
 void esgx_entity_set_pos(ESGX_Entity *e, double x, double y)
 {
@@ -158,10 +141,6 @@ void esgx_entity_set_draw(ESGX_Entity *e, ESGX_Draw *draw)
     e->draw = draw;
     entity_compute_size(e);
 }
-
-/* ============================================================
- *  Listes d'entités
- * ============================================================ */
 
 void esgx_entities_update_all(ESGX_Entity **entities, int size)
 {

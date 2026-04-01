@@ -46,7 +46,6 @@ void esgx_window_flip(void)
 
 void esgx_window_quit(void)
 {
-    /* esgx_screen est géré par SDL, pas besoin de SDL_FreeSurface */
     esgx_screen = NULL;
     SDL_Quit();
     printf("[ESGX] Fenêtre fermée.\n");

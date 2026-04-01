@@ -1,7 +1,3 @@
-/*
- * demo_painter.c - Outil de dessin interactif ESGX
- */
-
 #include "../include/esgx.h"
 #include <stdlib.h>
 #include <string.h>
@@ -123,7 +119,6 @@ int main(int argc, char *argv[])
             }
         }
 
-        /* Clic gauche : UNE seule forme par clic (mouse_button_down = one-shot) */
         if (ev.mouse_button_down && ev.mouse_button == ESGX_MOUSE_LEFT) {
             if (ev.mouse_y < WIN_H - 80 && shape_count < MAX_SHAPES) {
                 PlacedShape *s = &shapes[shape_count++];
@@ -135,7 +130,6 @@ int main(int argc, char *argv[])
             }
         }
 
-        /* Rendu */
         esgx_window_clear(245, 245, 240);
 
         int i;
